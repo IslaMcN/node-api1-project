@@ -34,12 +34,16 @@ server.get('/api/now', (req, res) => {
 server.post('/api/users', (req, res) => {
     const data = req.body;
     console.log('data', data);
+    if(!data.bio || !data.name){
+        res.status(400).json({message: 'Please provide name and bio for the user.'})
+    }else
     database
     .insert(data)
     .then(dat => {
         res.status(201).json(dat);
     })
     .catch(err => {
+       
         res.status(500).json({
             err: err,
             message: 'failed to create'
@@ -55,6 +59,7 @@ server.delete('/api/users/:id', (req, res) => {
         res.json(dat);
     })
     .catch(error => {
+        
         res.json({ message: 'error deleting'});
     });
 });
