@@ -10,19 +10,23 @@ server.get('/api/users', (req, res) => {
         res.send(data);
     })
     .catch(error => {
-        res.send(error);
+        res.json({error: "The users information could not be received."});
     });
 });
 
 server.get('/api/users/:id', (req, res) => {
     const id = req.params.id;
+    
     database
     .findById(id)
-    .then(data => {
-        res.send(data);
-    })
+    .then(data => {if (data){
+        res.status(200).json(data)
+    }else{
+        res.status(404).json({message: "The user with that ID does not exist."})
+    }} )
+    
     .catch(error => {
-        res.send(error);
+        res.status(500).json({message: "The user information could not be retrieved."});
     });
 });
 
@@ -46,7 +50,7 @@ server.post('/api/users', (req, res) => {
        
         res.status(500).json({
             err: err,
-            message: 'failed to create'
+            message: 'There was an error while saving the user to the database.'
         })
     })
 });
@@ -55,9 +59,11 @@ server.delete('/api/users/:id', (req, res) => {
     const id = req.params.id;
     database
     .remove(id)
-    .then(dat => {
-        res.json(dat);
-    })
+    .then(data => {if (data){
+        res.status(200).json(data)
+    }else{
+        res.status(404).json({message: "The user with that ID does not exist."})
+    }} )
     .catch(error => {
         
         res.json({ message: 'error deleting'});
