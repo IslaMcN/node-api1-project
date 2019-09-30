@@ -2,6 +2,7 @@
 const express = require('express');
 const server = express();
 const database = require('./data/db')
+server.use(express.json());
 server.get('/api/users', (req, res) => {
     database
     .find()
@@ -16,7 +17,7 @@ server.get('/api/users', (req, res) => {
 server.get('/api/users/:id', (req, res) => {
     const id = req.params.id;
     database
-    .find(id)
+    .findById(id)
     .then(data => {
         res.send(data);
     })
@@ -25,13 +26,36 @@ server.get('/api/users/:id', (req, res) => {
     });
 });
 
+server.get('/api/now', (req, res) => {
+    const now = new Date(). toISOString();
+    res.send(now);
+})
+
 server.post('/api/users', (req, res) => {
     const data = req.body;
     console.log('data', data);
     database
-    .add(data)
+    .insert(data)
     .then(dat => {
-        res.json({message: 'error saving the data'});
+        res.status(201).json(dat);
+    })
+    .catch(err => {
+        res.status(500).json({
+            err: err,
+            message: 'failed to create'
+        })
+    })
+});
+
+server.delete('/api/users/:id', (req, res) => {
+    const id = req.params.id;
+    database
+    .remove(id)
+    .then(dat => {
+        res.json(dat);
+    })
+    .catch(error => {
+        res.json({ message: 'error deleting'});
     });
 });
 
